@@ -12,6 +12,7 @@ const Rating = ({rating}: {rating: Number}) => {
       {[1, 2, 3, 4, 5].map((val, index) => {
         return index < rating ? (
           <AntDesign
+            key={index}
             name="star"
             size={getFontSize(9)}
             color={theme.custom.orange}
@@ -19,6 +20,7 @@ const Rating = ({rating}: {rating: Number}) => {
           />
         ) : (
           <AntDesign
+            key={index}
             name="staro"
             size={getFontSize(9)}
             color={theme.custom.medium_grey}
