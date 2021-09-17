@@ -2,8 +2,7 @@ import {getData, keys} from '@helpers/StorageHelper'
 import axios, {AxiosRequestConfig, AxiosResponse} from 'axios'
 
 export const axiosInstance = axios.create({
-  // baseURL: 'http://192.168.1.18:3000/api/v1',
-  baseURL: 'http://10.10.11.24:3000/api/v1',
+  baseURL: 'http://192.168.1.16:3000/api/v1',
 })
 const ResponseInterceptor = (response: AxiosResponse) => {
   if (response.data.response === 'FAIL') {
