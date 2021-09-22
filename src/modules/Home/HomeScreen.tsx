@@ -1,19 +1,18 @@
 import React, {useState, useEffect} from 'react'
-import {View, Image, FlatList} from 'react-native'
+import {View, FlatList} from 'react-native'
 import {useQuery} from 'react-query'
 import {useIsFocused} from '@react-navigation/native'
 
 import {HomeScreenStyles as styles} from '@styles/HomeScreenStyles'
-import {Label12, Label14Light, Label19} from '@components/AppText'
+import {Label14Light, Label19} from '@components/AppText'
 import AppTextInput from '@components/AppTextInput'
 import RecipeVerticalCard from './components/RecipeVerticalCard'
 import RecipeHorizontalCard from './components/RecipeHorizontalCard'
-import Recipes from '@config/Recipes'
 import AppSpinner from '@components/AppSpinner'
 import NavigationService from '@navigation/NavigationService'
 import {axiosInstance} from '@api/axios'
 
-function HomeScreen(props) {
+function HomeScreen() {
   const isFocused = useIsFocused()
   const getHomeRecipes = () => axiosInstance.get('/home_recipes')
   const {data, isLoading, refetch} = useQuery<any>(
@@ -21,14 +20,38 @@ function HomeScreen(props) {
     getHomeRecipes,
   )
   const [searchValue, setSearchValue] = useState('')
+  const [recipes, setRecipes] = useState(data)
   useEffect(() => {
     if (isFocused) refetch()
   }, [isFocused])
-  const handleAllSeePress = (title) => {
+  useEffect(() => {
+    setRecipes(data)
+  }, [data])
+  useEffect(() => {
+    if (searchValue) {
+      setRecipes({
+        freshRecipes: data.freshRecipes.filter(
+          (item) =>
+            item.name.toLowerCase().includes(searchValue.toLowerCase()) ||
+            item.category.toLowerCase().includes(searchValue.toLowerCase()),
+        ),
+        recommendedRecipes: data.recommendedRecipes.filter(
+          (item) =>
+            item.name.toLowerCase().includes(searchValue.toLowerCase()) ||
+            item.category.toLowerCase().includes(searchValue.toLowerCase()),
+        ),
+      })
+    } else {
+      setRecipes(data)
+    }
+  }, [searchValue])
+  const handleAllSeePress = (title, key) => {
     NavigationService.navigate('SeeAllRecipes', {
       title,
+      key,
     })
   }
+  if (!data) return null
   return (
     <View style={styles.wrapper}>
       <Label19 style={styles.title}>What would you like to cook today?</Label19>
@@ -40,27 +63,23 @@ function HomeScreen(props) {
           isSearch
           textInputContainerStyle={styles.textInputContainer}
         />
-        <View style={styles.iconContainer}>
-          <Image
-            source={require('@assets/filter.png')}
-            style={styles.filterIcon}
-          />
-        </View>
       </View>
-      <View style={styles.textContainer}>
-        <Label19 style={styles.title}>Today's Fresh Recipes</Label19>
-        <Label14Light
-          style={styles.subTitle}
-          onPress={() => handleAllSeePress("Today's Fresh Recipes")}>
-          See All
-        </Label14Light>
-      </View>
-      {data && (
+      {recipes && recipes.freshRecipes.length > 0 && (
         <>
+          <View style={styles.textContainer}>
+            <Label19 style={styles.title}>New Fresh Recipes</Label19>
+            <Label14Light
+              style={styles.subTitle}
+              onPress={() =>
+                handleAllSeePress('New Fresh Recipes', 'fresh_recipes')
+              }>
+              See All
+            </Label14Light>
+          </View>
           <View style={styles.listContainer}>
             <FlatList
               horizontal
-              data={data.todayFreshRecipes}
+              data={recipes.freshRecipes}
               keyExtractor={(item) => item._id}
               renderItem={({item}) => (
                 <RecipeVerticalCard
@@ -73,17 +92,23 @@ function HomeScreen(props) {
               showsHorizontalScrollIndicator={false}
             />
           </View>
+        </>
+      )}
+      {recipes && recipes.recommendedRecipes.length > 0 && (
+        <>
           <View style={styles.textContainer}>
             <Label19 style={styles.title}>Recommended</Label19>
             <Label14Light
               style={styles.subTitle}
-              onPress={() => handleAllSeePress('Recommended')}>
+              onPress={() =>
+                handleAllSeePress('Recommended', 'recommended_recipes')
+              }>
               See All
             </Label14Light>
           </View>
           <View style={styles.verticalListContainer}>
             <FlatList
-              data={data.recommendedRecipes}
+              data={recipes.recommendedRecipes}
               keyExtractor={(item) => item._id}
               renderItem={({item}) => (
                 <RecipeHorizontalCard

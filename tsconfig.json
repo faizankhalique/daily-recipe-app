@@ -21,7 +21,8 @@
       "@api/*": ["api/*"],
       "@modules/*": ["modules/*"],
       "@config/*": ["config/*"],
-      "@hooks/*": ["hooks/*"]
+      "@hooks/*": ["hooks/*"],
+      "@models/*": ["models/*"]
     },
     "types": ["jest"],
     "allowSyntheticDefaultImports": true,

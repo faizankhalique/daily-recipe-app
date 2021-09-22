@@ -27,7 +27,6 @@ export const HomeScreenStyles = StyleSheet.create({
     backgroundColor: theme.custom.light_black,
     borderRadius: 6,
     paddingHorizontal: wp(3),
-    width: '80%',
   },
   searchContainer: {
     flexDirection: 'row',

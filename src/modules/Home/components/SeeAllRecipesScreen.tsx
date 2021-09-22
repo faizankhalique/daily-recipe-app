@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react'
-import {View, Image, FlatList} from 'react-native'
+import {View, FlatList} from 'react-native'
 import {useQuery} from 'react-query'
 import {useIsFocused} from '@react-navigation/native'
 
@@ -12,19 +12,38 @@ import {axiosInstance} from '@api/axios'
 import NavigationService from '@navigation/NavigationService'
 
 function SeeAllRecipesScreen(props) {
+  const {title, key} = props.route.params
   const isFocused = useIsFocused()
 
-  const getAllRecipes = () => axiosInstance.get('/recipe')
+  const getAllRecipes = () => axiosInstance.get(`/${key}`)
   const {
-    data: recipes,
+    data: allRecipes,
     refetch,
     isLoading,
-  } = useQuery('allRecipes', getAllRecipes)
-  const {title} = props.route.params
+  } = useQuery<any>(key, getAllRecipes)
   useEffect(() => {
     if (isFocused) refetch()
   }, [isFocused])
   const [searchValue, setSearchValue] = useState('')
+  const [recipes, setRecipes] = useState(allRecipes)
+  useEffect(() => {
+    if (isFocused) refetch()
+  }, [isFocused])
+  useEffect(() => {
+    setRecipes(allRecipes)
+  }, [allRecipes])
+  useEffect(() => {
+    if (searchValue) {
+      const filterRecipes = allRecipes.filter(
+        (item) =>
+          item.name.toLowerCase().includes(searchValue.toLowerCase()) ||
+          item.category.toLowerCase().includes(searchValue.toLowerCase()),
+      )
+      setRecipes(filterRecipes)
+    } else {
+      setRecipes(allRecipes)
+    }
+  }, [searchValue])
 
   return (
     <View style={styles.wrapper}>
@@ -37,12 +56,6 @@ function SeeAllRecipesScreen(props) {
           isSearch
           textInputContainerStyle={styles.textInputContainer}
         />
-        <View style={styles.iconContainer}>
-          <Image
-            source={require('@assets/filter.png')}
-            style={styles.filterIcon}
-          />
-        </View>
       </View>
       <View style={styles.verticalListContainer}>
         {recipes && (
