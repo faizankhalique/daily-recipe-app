@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react'
-import {View, Image, FlatList, TouchableOpacity} from 'react-native'
-import {useQuery} from 'react-query'
+import {View, FlatList, TouchableOpacity} from 'react-native'
+import {useQuery, useMutation} from 'react-query'
 import {useIsFocused} from '@react-navigation/native'
 
 import {RecentlyViewedScreenStyles as styles} from '@styles/RecentlyViewedScreenStyles'
@@ -21,6 +21,13 @@ function RecentlyViewedScreen(props) {
     refetch,
     isLoading,
   } = useQuery<any>('recentlyViewedRecipes', getRecentlyViewedRecipes)
+  const {mutate: removeRecentlyViewedRecipe, isLoading: isLoading_} =
+    useMutation(() => axiosInstance.delete('/remove_recently_viewed_recipe'), {
+      onSuccess: () => {
+        refetch()
+      },
+    })
+
   const [recipes, setRecipes] = useState(recentlyViewedRecipes)
   useEffect(() => {
     if (isFocused) refetch()
@@ -54,7 +61,7 @@ function RecentlyViewedScreen(props) {
         />
         <TouchableOpacity
           style={styles.iconContainer}
-          onPress={() => setSearchValue('')}>
+          onPress={() => removeRecentlyViewedRecipe()}>
           <Label12 style={styles.clearText}>Clear</Label12>
         </TouchableOpacity>
       </View>
@@ -75,7 +82,7 @@ function RecentlyViewedScreen(props) {
           />
         )}
       </View>
-      <AppSpinner loading={isLoading} />
+      <AppSpinner loading={isLoading || isLoading_} />
     </View>
   )
 }

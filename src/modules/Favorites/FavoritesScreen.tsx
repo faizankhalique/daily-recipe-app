@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react'
-import {View, Image, FlatList} from 'react-native'
+import {View, FlatList} from 'react-native'
 import {useQuery} from 'react-query'
 import {useIsFocused} from '@react-navigation/native'
 
@@ -18,12 +18,28 @@ function FavoritesScreen(props) {
     data: favoritesRecipes,
     refetch,
     isLoading,
-  } = useQuery('favoritesRecipes', getFavoritesRecipes)
+  } = useQuery<any>('favoritesRecipes', getFavoritesRecipes)
+
   const [searchValue, setSearchValue] = useState('')
+  const [recipes, setRecipes] = useState(favoritesRecipes)
   useEffect(() => {
     if (isFocused) refetch()
   }, [isFocused])
-
+  useEffect(() => {
+    setRecipes(favoritesRecipes)
+  }, [favoritesRecipes])
+  useEffect(() => {
+    if (searchValue) {
+      const filterRecipes = favoritesRecipes.filter(
+        (item) =>
+          item.name.toLowerCase().includes(searchValue.toLowerCase()) ||
+          item.category.toLowerCase().includes(searchValue.toLowerCase()),
+      )
+      setRecipes(filterRecipes)
+    } else {
+      setRecipes(favoritesRecipes)
+    }
+  }, [searchValue])
   return (
     <View style={styles.wrapper}>
       <Label19 style={styles.title}>My Favorites</Label19>
@@ -35,29 +51,21 @@ function FavoritesScreen(props) {
           isSearch
           textInputContainerStyle={styles.textInputContainer}
         />
-        <View style={styles.iconContainer}>
-          <Image
-            source={require('@assets/filter.png')}
-            style={styles.filterIcon}
-          />
-        </View>
       </View>
       <View style={styles.verticalListContainer}>
-        {favoritesRecipes && (
-          <FlatList
-            data={favoritesRecipes}
-            keyExtractor={(item) => item._id}
-            renderItem={({item}) => (
-              <RecipeHorizontalCard
-                recipe={{...item, isLiked: true}}
-                onPress={() =>
-                  NavigationService.navigate('RecipeDetails', {id: item._id})
-                }
-              />
-            )}
-            showsVerticalScrollIndicator={false}
-          />
-        )}
+        <FlatList
+          data={recipes}
+          keyExtractor={(item) => item._id}
+          renderItem={({item}) => (
+            <RecipeHorizontalCard
+              recipe={{...item, isLiked: true}}
+              onPress={() =>
+                NavigationService.navigate('RecipeDetails', {id: item._id})
+              }
+            />
+          )}
+          showsVerticalScrollIndicator={false}
+        />
       </View>
       <AppSpinner loading={isLoading} />
     </View>

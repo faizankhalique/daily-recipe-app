@@ -5,5 +5,5 @@ export const isValidEmail = (email: string) => {
 }
 
 export const getImageUrl = (url) => {
-  return url.replace('127.0.0.1', '192.168.1.16')
+  return url.replace('127.0.0.1', '192.168.1.5')
 }
