@@ -10,6 +10,7 @@ import RecipeHorizontalCard from '@modules/Home/components/RecipeHorizontalCard'
 import AppSpinner from '@components/AppSpinner'
 import NavigationService from '@navigation/NavigationService'
 import {axiosInstance} from '@api/axios'
+import {useSearch} from '@hooks/useSerach'
 
 function FavoritesScreen(props) {
   const isFocused = useIsFocused()
@@ -21,25 +22,13 @@ function FavoritesScreen(props) {
   } = useQuery<any>('favoritesRecipes', getFavoritesRecipes)
 
   const [searchValue, setSearchValue] = useState('')
-  const [recipes, setRecipes] = useState(favoritesRecipes)
   useEffect(() => {
     if (isFocused) refetch()
   }, [isFocused])
-  useEffect(() => {
-    setRecipes(favoritesRecipes)
-  }, [favoritesRecipes])
-  useEffect(() => {
-    if (searchValue) {
-      const filterRecipes = favoritesRecipes.filter(
-        (item) =>
-          item.name.toLowerCase().includes(searchValue.toLowerCase()) ||
-          item.category.toLowerCase().includes(searchValue.toLowerCase()),
-      )
-      setRecipes(filterRecipes)
-    } else {
-      setRecipes(favoritesRecipes)
-    }
-  }, [searchValue])
+  const {hits: recipes} = useSearch(favoritesRecipes, searchValue, [
+    'name',
+    'category',
+  ])
   return (
     <View style={styles.wrapper}>
       <Label19 style={styles.title}>My Favorites</Label19>
