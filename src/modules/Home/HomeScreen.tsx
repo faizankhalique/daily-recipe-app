@@ -11,7 +11,9 @@ import RecipeHorizontalCard from './components/RecipeHorizontalCard'
 import AppSpinner from '@components/AppSpinner'
 import NavigationService from '@navigation/NavigationService'
 import {axiosInstance} from '@api/axios'
+import {useSearch} from '@hooks/useSerach'
 
+const searchKeys = ['name', 'category']
 function HomeScreen() {
   const isFocused = useIsFocused()
   const getHomeRecipes = () => axiosInstance.get('/home_recipes')
@@ -20,31 +22,20 @@ function HomeScreen() {
     getHomeRecipes,
   )
   const [searchValue, setSearchValue] = useState('')
-  const [recipes, setRecipes] = useState(data)
   useEffect(() => {
     if (isFocused) refetch()
   }, [isFocused])
-  useEffect(() => {
-    setRecipes(data)
-  }, [data])
-  useEffect(() => {
-    if (searchValue) {
-      setRecipes({
-        freshRecipes: data.freshRecipes.filter(
-          (item) =>
-            item.name.toLowerCase().includes(searchValue.toLowerCase()) ||
-            item.category.toLowerCase().includes(searchValue.toLowerCase()),
-        ),
-        recommendedRecipes: data.recommendedRecipes.filter(
-          (item) =>
-            item.name.toLowerCase().includes(searchValue.toLowerCase()) ||
-            item.category.toLowerCase().includes(searchValue.toLowerCase()),
-        ),
-      })
-    } else {
-      setRecipes(data)
-    }
-  }, [searchValue])
+
+  const {hits: freshRecipes} = useSearch(
+    data.freshRecipes,
+    searchValue,
+    searchKeys,
+  )
+  const {hits: recommendedRecipes} = useSearch(
+    data.recommendedRecipes,
+    searchValue,
+    searchKeys,
+  )
   const handleAllSeePress = (title, key) => {
     NavigationService.navigate('SeeAllRecipes', {
       title,
@@ -64,7 +55,7 @@ function HomeScreen() {
           textInputContainerStyle={styles.textInputContainer}
         />
       </View>
-      {recipes && recipes.freshRecipes.length > 0 && (
+      {freshRecipes.length > 0 && (
         <>
           <View style={styles.textContainer}>
             <Label19 style={styles.title}>New Fresh Recipes</Label19>
@@ -79,7 +70,7 @@ function HomeScreen() {
           <View style={styles.listContainer}>
             <FlatList
               horizontal
-              data={recipes.freshRecipes}
+              data={freshRecipes}
               keyExtractor={(item) => item._id}
               renderItem={({item}) => (
                 <RecipeVerticalCard
@@ -94,7 +85,7 @@ function HomeScreen() {
           </View>
         </>
       )}
-      {recipes && recipes.recommendedRecipes.length > 0 && (
+      {recommendedRecipes.length > 0 && (
         <>
           <View style={styles.textContainer}>
             <Label19 style={styles.title}>Recommended</Label19>
@@ -108,7 +99,7 @@ function HomeScreen() {
           </View>
           <View style={styles.verticalListContainer}>
             <FlatList
-              data={recipes.recommendedRecipes}
+              data={recommendedRecipes}
               keyExtractor={(item) => item._id}
               renderItem={({item}) => (
                 <RecipeHorizontalCard

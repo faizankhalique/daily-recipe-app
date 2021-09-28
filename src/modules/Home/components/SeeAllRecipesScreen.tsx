@@ -10,6 +10,7 @@ import AppSpinner from '@components/AppSpinner'
 import AppHeader from '@navigation/AppHeader'
 import {axiosInstance} from '@api/axios'
 import NavigationService from '@navigation/NavigationService'
+import {useSearch} from '@hooks/useSerach'
 
 function SeeAllRecipesScreen(props) {
   const {title, key} = props.route.params
@@ -25,25 +26,13 @@ function SeeAllRecipesScreen(props) {
     if (isFocused) refetch()
   }, [isFocused])
   const [searchValue, setSearchValue] = useState('')
-  const [recipes, setRecipes] = useState(allRecipes)
   useEffect(() => {
     if (isFocused) refetch()
   }, [isFocused])
-  useEffect(() => {
-    setRecipes(allRecipes)
-  }, [allRecipes])
-  useEffect(() => {
-    if (searchValue) {
-      const filterRecipes = allRecipes.filter(
-        (item) =>
-          item.name.toLowerCase().includes(searchValue.toLowerCase()) ||
-          item.category.toLowerCase().includes(searchValue.toLowerCase()),
-      )
-      setRecipes(filterRecipes)
-    } else {
-      setRecipes(allRecipes)
-    }
-  }, [searchValue])
+  const {hits: recipes} = useSearch(allRecipes, searchValue, [
+    'name',
+    'category',
+  ])
 
   return (
     <View style={styles.wrapper}>

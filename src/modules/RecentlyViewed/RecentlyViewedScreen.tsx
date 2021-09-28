@@ -10,6 +10,7 @@ import RecipeHorizontalCard from '@modules/Home/components/RecipeHorizontalCard'
 import AppSpinner from '@components/AppSpinner'
 import NavigationService from '@navigation/NavigationService'
 import {axiosInstance} from '@api/axios'
+import {useSearch} from '@hooks/useSerach'
 
 function RecentlyViewedScreen(props) {
   const isFocused = useIsFocused()
@@ -28,26 +29,13 @@ function RecentlyViewedScreen(props) {
       },
     })
 
-  const [recipes, setRecipes] = useState(recentlyViewedRecipes)
   useEffect(() => {
     if (isFocused) refetch()
   }, [isFocused])
-  useEffect(() => {
-    setRecipes(recentlyViewedRecipes)
-  }, [recentlyViewedRecipes])
-  useEffect(() => {
-    if (searchValue) {
-      setRecipes(
-        recentlyViewedRecipes.filter(
-          (item) =>
-            item.name.toLowerCase().includes(searchValue.toLowerCase()) ||
-            item.category.toLowerCase().includes(searchValue.toLowerCase()),
-        ),
-      )
-    } else {
-      setRecipes(recentlyViewedRecipes)
-    }
-  }, [searchValue])
+  const {hits: recipes} = useSearch(recentlyViewedRecipes, searchValue, [
+    'name',
+    'category',
+  ])
   return (
     <View style={styles.wrapper}>
       <Label19 style={styles.title}>Recently Viewed</Label19>
