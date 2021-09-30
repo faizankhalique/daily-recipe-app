@@ -27,12 +27,12 @@ function HomeScreen() {
   }, [isFocused])
 
   const {hits: freshRecipes} = useSearch(
-    data.freshRecipes,
+    data?.freshRecipes,
     searchValue,
     searchKeys,
   )
   const {hits: recommendedRecipes} = useSearch(
-    data.recommendedRecipes,
+    data?.recommendedRecipes,
     searchValue,
     searchKeys,
   )
@@ -55,7 +55,7 @@ function HomeScreen() {
           textInputContainerStyle={styles.textInputContainer}
         />
       </View>
-      {freshRecipes.length > 0 && (
+      {freshRecipes?.length > 0 && (
         <>
           <View style={styles.textContainer}>
             <Label19 style={styles.title}>New Fresh Recipes</Label19>
@@ -85,7 +85,7 @@ function HomeScreen() {
           </View>
         </>
       )}
-      {recommendedRecipes.length > 0 && (
+      {recommendedRecipes?.length > 0 && (
         <>
           <View style={styles.textContainer}>
             <Label19 style={styles.title}>Recommended</Label19>
