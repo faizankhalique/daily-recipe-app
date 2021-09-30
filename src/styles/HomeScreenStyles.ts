@@ -143,10 +143,9 @@ export const RecipeVerticalCardStyles = StyleSheet.create({
     paddingLeft: wp(3),
   },
   image: {
-    top: wp(-2),
-    right: wp(-4),
-    height: wp(30),
-    width: wp(30),
+    top: wp(-1),
+    height: wp(22),
+    width: wp(22),
     alignSelf: 'flex-end',
     position: 'absolute',
   },
@@ -177,12 +176,12 @@ export const RecipeHorizontalCardStyles = StyleSheet.create({
     paddingVertical: wp(2),
   },
   image: {
-    height: wp(28),
-    width: wp(28),
+    height: wp(24),
+    width: wp(24),
   },
   container: {
-    paddingRight: wp(4),
-    flex: 1,
+    paddingHorizontal: wp(1.5),
+    flex: 9,
   },
   row: {
     flexDirection: 'row',

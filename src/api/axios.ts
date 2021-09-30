@@ -1,8 +1,9 @@
 import {getData, keys} from '@helpers/StorageHelper'
 import axios, {AxiosRequestConfig, AxiosResponse} from 'axios'
+import {API_URL} from '@env'
 
 export const axiosInstance = axios.create({
-  baseURL: 'http://192.168.1.5:3000/api/v1',
+  baseURL: API_URL,
 })
 const ResponseInterceptor = (response: AxiosResponse) => {
   if (response.data.response === 'FAIL') {
